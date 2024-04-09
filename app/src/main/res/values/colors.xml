@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryDark">#026FE8</color>
+
+    <color name="colorPrimary">#419BFF</color>
+    <color name="colorAccent">#419BFF</color>
+
+    <color name="red">#419BFF</color>
+    <color name="tab_color">#E7344A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    // result_screen
+    <color name="darkGray">#2f323a</color>
+    <color name="lightGray">#64676c</color>
+    <color name="backGroundColor">#edeff5</color>
+    <color name="security_true">#a0d536</color>
+    <color name="security_false">#db4437</color>
+</resources>

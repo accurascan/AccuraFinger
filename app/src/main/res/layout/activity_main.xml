@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="25dp"
+    tools:context="com.accura.finger.print.demo.MainActivity">
+
+    <TextView
+        android:id="@+id/tv_company"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5dp"
+        android:padding="@dimen/_15dp"
+        android:text="Company : "
+        android:textColor="@color/darkGray"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/checkGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <CheckBox
+                android:id="@+id/left_check"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_20dp"
+                android:padding="@dimen/_15dp"
+                android:text="Left Hand"
+                android:textSize="18sp"
+                android:checked="true"
+                android:layout_weight="1"
+                app:typeface="ALLER_STD_REG"
+                android:onClick="selectHand"/>
+            <CheckBox
+                android:id="@+id/right_check"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_20dp"
+                android:padding="@dimen/_15dp"
+                android:text="Right Hand"
+                android:textSize="18sp"
+                android:checked="false"
+                android:layout_weight="1"
+                app:typeface="ALLER_STD_REG"
+                android:onClick="selectHand" />
+        </LinearLayout>
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_below="@id/checkGroup"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/lout_country"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/lout_enroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/_5dp"
+                    android:background="@drawable/btn_bg_gray"
+                    android:padding="@dimen/_15dp"
+                    android:text="Enroll"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/lout_verify"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/_5dp"
+                    android:background="@drawable/btn_bg_gray"
+                    android:padding="@dimen/_15dp"
+                    android:text="Verify"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </RelativeLayout>
+
+</LinearLayout>

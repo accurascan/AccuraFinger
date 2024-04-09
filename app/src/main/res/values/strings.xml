@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">FingerPrint Verification</string>
+    <string name="passport_mrz"><![CDATA[Passport MRZ]]></string>
+    <string name="id_mrz"><![CDATA[ID Card MRZ]]></string>
+    <string name="visa_mrz"><![CDATA[VISA MRZ]]></string>
+    <string name="other_mrz"><![CDATA[Other MRZ]]></string>
+    <string name="bank_card">Bank Card</string>
+
+
+    <string name="usa_dl_result">USA DL Result</string>
+    <string name="PDF417_Barcode">PDF417 Barcode</string>
+    <string name="user_name">Enter username for Enrollment</string>
+
+    <string name="hint_user_name">Enter User Name</string>
+    <string name="info_msg">Please place left hand 4 fingers in frame</string>
+    <string name="info_right_msg">Please place right hand 4 fingers in frame</string>
+    <string name="finger_error_msg">Move and place your fingers properly</string>
+    <string name="away_message">Keep fingers slightly away from the Camera</string>
+    <string name="closer_msg">Keep fingers close to the Camera</string>
+    <string name="keep_distance">Keep distance between Fingers</string>
+
+    <dimen name="text_title_size">17sp</dimen>
+    <dimen name="text_title_left">15dp</dimen>
+    <dimen name="result_title_text">17sp</dimen>
+
+<!--    <string name="print_score">-->
+<!--        <font color="#FFFFFF">Template Score is : </font><font color="#d32d38">%s \n %f</font>-->
+<!--        <font color="#FFFFFF">\n SIFT Score is : </font><font color="#d32d38">%s \n %f</font>-->
+<!--        <font color="#FFFFFF">\n Minutiae Score is : </font><font color="#d32d38">%s \n %f</font></string>-->
+</resources>

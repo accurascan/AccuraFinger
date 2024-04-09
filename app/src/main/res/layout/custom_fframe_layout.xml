@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.accura.finger.print.demo.customView.SemiCircleView
+        android:id="@+id/border_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.accura.finger.print.demo.HorizontalProgressView
+        android:id="@+id/tv_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/_5dp"
+        android:paddingEnd="@dimen/_5dp"
+        android:gravity="center"
+        android:layout_above="@id/ocr_frame"
+        android:background="@drawable/border_red"/>
+    <FrameLayout
+        android:id="@+id/ocr_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="-2dp"
+        android:layout_marginTop="@dimen/_10dp"
+        android:layout_marginBottom="@dimen/_10dp"
+        android:gravity="end"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/border_frame1"
+            android:layout_width="170dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/border_frame2"
+            android:layout_width="180dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/border_frame3"
+            android:layout_width="180dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/border_frame4"
+            android:layout_width="170dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:visibility="visible" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignEnd="@id/ocr_frame"
+        android:layout_alignStart="@id/ocr_frame"
+        android:layout_alignTop="@id/ocr_frame"
+        android:layout_alignBottom="@id/ocr_frame"
+        android:paddingTop="@dimen/_10dp"
+        android:paddingBottom="@dimen/_10dp"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/im_hint_small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/trans_left_hand"
+            android:scaleType="fitStart"
+            android:adjustViewBounds="true"
+            android:tint="@color/white"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view_top_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/ocr_frame"
+        android:background="@color/trans_black"
+        android:visibility="invisible"/>
+    <View
+        android:id="@+id/view_bottom_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/ocr_frame"
+        android:background="@color/trans_black"
+        android:visibility="invisible"/>
+    
+    <View
+        android:id="@+id/view_left_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@id/ocr_frame"
+        android:layout_alignBottom="@id/ocr_frame"
+        android:layout_toStartOf="@id/ocr_frame"
+        android:background="@color/trans_black"
+        android:visibility="invisible" />
+
+    <View
+        android:id="@+id/view_right_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/ocr_frame"
+        android:layout_alignBottom="@id/ocr_frame"
+        android:layout_toEndOf="@id/ocr_frame"
+        android:background="@color/trans_black"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/tv_progress"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="@string/info_msg"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_alignEnd="@id/ocr_frame"
+            android:layout_alignBottom="@id/ocr_frame">
+        </LinearLayout>
+</RelativeLayout>
