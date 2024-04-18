@@ -49,7 +49,6 @@ public class OcrResultActivity extends AppCompatActivity {
         if (recogType == RecogType.FINGER_PRINT) {
             final FingerModel fingerModel = FingerModel.getModel();
             if (fingerModel != null) {
-                fingerModels = FingerModel.getModels();
                 setFingerPrintData(fingerModel);
             }
         }
@@ -164,8 +163,8 @@ public class OcrResultActivity extends AppCompatActivity {
             Glide.with(OcrResultActivity.this).load(imagePath).into(imageView);
             imageView.setVisibility(View.VISIBLE);
 
-            Spannable builderInverted = getColoredStringNew(printData.getStringsOld()[0].toUpperCase(Locale.ROOT),
-                    printData.getStringsOld()[i],fingerModels.get(0).getFloatArrayOld()[i],fingerModels.get(1).getFloatArrayOld()[i],fingerModels.get(2).getFloatArrayOld()[i]);
+            Spannable builderInverted = getColoredStringNew(printData.getStrings()[0].toUpperCase(Locale.ROOT),
+                    printData.getStrings()[i],fingerModels.get(0).getFloatArray()[i],fingerModels.get(1).getFloatArray()[i],fingerModels.get(2).getFloatArray()[i]);
 
             tv_value.setVisibility(View.VISIBLE);
             tv_value.setText(builderInverted, TextView.BufferType.SPANNABLE);

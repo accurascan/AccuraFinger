@@ -49,7 +49,7 @@ Below steps to setup AccuraScan's Finger SDK to your project.
 
         coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
         // Accura Finger
-        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.2'
+        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.3'
     }
 
 #### Step 4: Add files to project assets folder:
@@ -103,19 +103,18 @@ private void initCamera() {
     cameraView = new CameraView(this);
     
     if (recogType == RecogType.FINGER_PRINT) {
-        // fingerType = "enroll" or "verify"
-        // fingerSideType = 0 for Left hand and 1 for Right Hand
+        // fingerType = FingerEngine.FINGER_ENROLL or FingerEngine.FINGER_VERIFY
+        // fingerSideType = FingerEngine.LEFT_HAND  or FingerEngine.RIGHT_HAND
         cameraView.setFingerType(fingerType, fingerSideType);
-        cameraView.setName(userName);
+        cameraView.setUserName(userName);
     }
     cameraView.setRecogType(recogType)
             .setFrameView(ocr_frame) // make sure ocr_frame 4 child layout same as used in this demo app
             .setFlashMode(CameraView.FLASH_MODE_ON) // CameraView.FLASH_MODE_OFF
             .setView(linearLayout) // To add camera view
             .setCameraFacing(0) // // To set selfie(1) or rear(0) camera.
-            .setOcrCallback(this)  // To get feedback and Success Call back
+            .setFingerCallback(this)  // To get feedback and Success Call back
             .setStatusBarHeight(statusBarHeight)  // To remove Height from Camera View if status bar visible
-            .setFrontSide() // or cameraView.setBackSide(); to scan card side front or back default it's scan front side first
 //                Optional setup
 //                .setEnableMediaPlayer(false) // false to disable default sound and true to enable sound and default it is true
 //                .setCustomMediaPlayer(MediaPlayer.create(this, /*custom sound file*/)) // To add your custom sound and Must have to enable media player
@@ -172,11 +171,22 @@ public void onScannedComplete(Object result) {
         // Do some code for display data
         FingerEngine fingerEngine = new FingerEngine();
         Runnable runnable = () -> {
-            if (fingerType.equals("enroll")) {
-                FingerModel.setModel((FingerModel) result);
+            if (fingerType.equals(FingerEngine.FINGER_ENROLL)) {
+                List<?> list = new ArrayList<>();
+                if (result.getClass().isArray() ) {
+                    list = Arrays.asList((Object[])result);
+                } else if (result instanceof Collection) {
+                    list = new ArrayList<>((Collection<?>) result);
+                }
+                long uniqueID = -1;
+                FingerModel fingerModel = null;
+                for (Object o : list) {
+                    fingerModel = (FingerModel) o;
+                    uniqueID = dbHelper.addUser(fingerModel, uniqueID);
+                }
                 
                 // Access data from database
-                List<FingerModel> fingerModels = dbhelper.getUserByUniqueID((FingerModel) result);
+                List<FingerModel> fingerModels = dbhelper.getUserByUniqueID(fingerModel);
                 
                 // Proccsing fingerprint images
                 fingerEngine.processImage(fingerModels);
@@ -187,9 +197,10 @@ public void onScannedComplete(Object result) {
                 }
                 
                 
-                Pair<Boolean, String> internalChecking = fingerEngine.internalChecking(fingerModels, 0);
-                if (!internalChecking.first) {
+                boolean isValid = fingerEngine.fingerValidation(fingerModels, 0);
+                if (isValid) {
                     Toast.makeText(this, "Enrollment Failed, Bad Prints Detected", Toast.LENGTH_SHORT).show()
+                    
                     // delete user from local database
                     for (FingerModel model : fingerModels){
                         dbhelper.deleteUser(model);
@@ -199,8 +210,8 @@ public void onScannedComplete(Object result) {
                 List<FingerModel> fingerAPIModels = dbhelper.getAllUser(fingerModels.get(0), false);
 
                 JSONObject object = new JSONObject();
-                boolean isValid = fingerEngine.fingerEnrolling(fingerModels, fingerAPIModels, object);
-                if (isValid) {
+                boolean _isValid = fingerEngine.checkingEnrollment(fingerModels, fingerAPIModels, object);
+                if (_isValid) {
                     Toast.makeText(this, "Member successfully added", Toast.LENGTH_SHORT).show()
                 } else {
                     // delete user from local database
@@ -210,16 +221,16 @@ public void onScannedComplete(Object result) {
                     Toast.makeText(this, "Enrollment failed, Found duplicate with " + object.getString("name"), Toast.LENGTH_SHORT).show()
                 }
                 
-            } else {
+            } else if (result instanceof FingerModel) {
                 ((FingerModel) result).setUserName(uniqueName); // set enrolled user name to match with
                 ((FingerModel) result).setUniqueID(uniqueId); // set enrolled unique Id to match with
                 FingerModel.setModel((FingerModel) result);
                 
                 fingerEngine.processImage(fingerModel);
                 List<FingerModel> fingerModels = new DatabaseHelper(FingerActivity.this).getAllUser(fingerModel, true);
-                float v2 = fingerEngine.fingerAPIAuthentication(fingerModel, fingerModels, 0, new JSONObject(), "", null);
+                float v2 = fingerEngine.fingerAuthentication(fingerModel, fingerModels, 0, new JSONObject(), "", null);
                 
-                Toast.makeText(this, "Hello " + fingerModel.getUserName() + ",\n" + fingerModel.getStringsOld()[0], Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Hello " + fingerModel.getUserName() + ",\n" + fingerModel.getStrings()[0], Toast.LENGTH_SHORT).show();
                 
             }
         };
@@ -241,11 +252,21 @@ public void onProcessUpdate(int titleCode, String errorMessage, boolean isFlip) 
     runOnUiThread(new Runnable() {
         @Override
         public void run() {
+            // Review FingerActivity.java file for UI changes and messages 
+   
             if (errorMessage != null) {
-                // Review FingerActivity.class file for UI changes and messages 
+                Toast.makeText(context, getErrorMessage(errorMessage), Toast.LENGTH_SHORT).show(); // display message
+            } else {
+                // show/hide animation if finger are not in camera
             }
         }
     });
+}
+
+@Override
+public void onProgress(float progress) {
+    // To display scanning progress
+    Toast.makeText(context, progress, Toast.LENGTH_SHORT).show();
 }
 
 @Override

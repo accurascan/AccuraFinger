@@ -26,7 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.accura.finger.print.sdk.database.DatabaseHelper;
+import com.accura.finger.print.demo.database.DatabaseHelper;
 import com.accura.finger.print.sdk.model.FingerModel;
 import com.accura.finger.print.sdk.util.AccuraFingerLog;
 import com.accura.finger.print.sdk.util.Util;
@@ -51,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void selectHand(View view) {
         if (view.getId() == R.id.right_check) {
-            fingerType = 1;
+            fingerSideType = FingerEngine.RIGHT_HAND;
             cbRight.setChecked(true);
             cbLeft.setChecked(false);
         } else if (view.getId() == R.id.left_check) {
-            fingerType = 0;
+            fingerSideType = FingerEngine.LEFT_HAND;
             cbLeft.setChecked(true);
             cbRight.setChecked(false);
         }
@@ -107,20 +107,20 @@ public class MainActivity extends AppCompatActivity {
             if (activity != null) {
                 try {
                     // doWorkNative();
-                    FingerEngine recogEngine = new FingerEngine();
+                    FingerEngine fingerEngine = new FingerEngine();
                     AccuraFingerLog.enableLogs(true); // make sure to disable logs in release mode
                     AccuraFingerLog.refreshLogfile(activity);
-                    AccuraFingerLog.loge(TAG,recogEngine.getVersion());
-                    recogEngine.setDialog(false); // setDialog(false) To set your custom dialog for license validation
-                    activity.sdkModel = recogEngine.initEngine(activity);
+                    AccuraFingerLog.loge(TAG,fingerEngine.getVersion());
+                    fingerEngine.setDialog(false); // setDialog(false) To set your custom dialog for license validation
+                    activity.sdkModel = fingerEngine.initEngine(activity);
                     if (activity.sdkModel == null){
                         return;
                     }
-                    AccuraFingerLog.loge(TAG, "SDK version" + recogEngine.getSDKVersion() + "\nInitialized Engine : " + activity.sdkModel.i + " -> " + activity.sdkModel.message);
+                    AccuraFingerLog.loge(TAG, "SDK version" + fingerEngine.getSDKVersion() + "\nInitialized Engine : " + activity.sdkModel.i + " -> " + activity.sdkModel.message);
                     activity.responseMessage = activity.sdkModel.message;
 
                     if (activity.sdkModel.i >= 0) {
-                        recogEngine.setBlurPercentage(activity, 100);
+                        fingerEngine.setBlurPercentage(activity, 100);
                         activity.handler.sendEmptyMessage(1);
                     } else
                         activity.handler.sendEmptyMessage(0);
@@ -228,10 +228,10 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, FingerActivity.class);
                     RecogType.FINGER_PRINT.attachTo(intent);
                     intent.putExtra("card_name", "Finger Print");
-                    intent.putExtra("finger_type", "verify");
+                    intent.putExtra("finger_scan_type", FingerEngine.FINGER_VERIFY);
                     intent.putExtra("unique_id", uniqueID);
                     intent.putExtra("unique_name", arrayList.get(which).getUserName());
-                    intent.putExtra("left_right_type", fingerType);
+                    intent.putExtra("left_right_type", fingerSideType);
                     startActivityForResult(intent, USER_VERIFY);
                     overridePendingTransition(0, 0);
                 }
@@ -281,9 +281,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, FingerActivity.class);
                 RecogType.FINGER_PRINT.attachTo(intent);
                 intent.putExtra("card_name", "Finger Print");
-                intent.putExtra("finger_type", "enroll");
+                intent.putExtra("finger_scan_type", FingerEngine.FINGER_ENROLL);
                 intent.putExtra("user_name", s);
-                intent.putExtra("left_right_type", fingerType);
+                intent.putExtra("left_right_type", fingerSideType);
                 startActivityForResult(intent, USER_ENROLL);
                 overridePendingTransition(0, 0);
 
@@ -318,9 +318,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, FingerActivity.class);
                 RecogType.FINGER_PRINT.attachTo(intent);
                 intent.putExtra("card_name", "Finger Print");
-                intent.putExtra("finger_type", "enroll");
+                intent.putExtra("finger_scan_type", FingerEngine.FINGER_ENROLL);
                 intent.putExtra("user_name", userName);
-                intent.putExtra("left_right_type", fingerType);
+                intent.putExtra("left_right_type", fingerSideType);
                 startActivityForResult(intent, USER_ENROLL);
                 overridePendingTransition(0, 0);
 
@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private int fingerType = 0;
+    private int fingerSideType = FingerEngine.LEFT_HAND;
     //requesting the camera permission
     public void requestCameraPermission() {
         int currentapiVersion = Build.VERSION.SDK_INT;
@@ -366,32 +366,27 @@ public class MainActivity extends AppCompatActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    FingerEngine recogEngine = new FingerEngine();
-                    long scanTime = FingerModel.getModel().getScanTime();
+                    FingerEngine fingerEngine = new FingerEngine();
                     List<FingerModel> fingerModels = dbhelper.getUserByUniqueID(FingerModel.getModel());
-                    recogEngine.processImage(fingerModels);
+                    fingerEngine.processImage(fingerModels);
                     for (FingerModel model : fingerModels){
-                        model.setScanTime(scanTime);
-                        model.setCompanyID(companyId);
                         dbhelper.updateFeatures(model);
                     }
 
                     runOnUiThread(() -> progressBar.setMessage("Checking the enrollment..."));
-                    Pair<Boolean, String> internalChecking = recogEngine.internalChecking(fingerModels, 0);
-                    if (!internalChecking.first) {
+                    boolean isValid = fingerEngine.fingerValidation(fingerModels, 0);
+                    if (!isValid) {
                         addMember(0, fingerModels, null);
                         return;
                     }
                     List<FingerModel> fingerAPIModels = dbhelper.getAllUser(fingerModels.get(0), false);
-                    Log.e(TAG, "run: " + fingerAPIModels.size());
 
                     JSONObject object = new JSONObject();
-                    boolean isValid = recogEngine.fingerEnrolling(fingerModels, fingerAPIModels, object);
-                    if (isValid) {
+                    boolean _isValid = fingerEngine.checkingEnrollment(fingerModels, fingerAPIModels, object);
+                    if (_isValid) {
                         object = null;
                     }
                     addMember(1, fingerModels, object);
-
                 }
 
                 private void addMember(int isGood, List<FingerModel> fingerModels, JSONObject object) {
@@ -413,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             for (FingerModel model : fingerModels){
-                                dbhelper.deleteUser(model);
+                                dbhelper.deleteUser(model); // remove invalid user which is already added in database
                             }
 
                         }
@@ -430,20 +425,20 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.show();
             }
             final FingerModel fingerModel = FingerModel.getModel();
-            final FingerEngine recogEngine = new FingerEngine();
+            final FingerEngine fingerEngine = new FingerEngine();
             Runnable runnable = new Runnable() {
                 public void run() {
                     List<FingerModel> fingerModels = new DatabaseHelper(MainActivity.this).getAllUser(FingerModel.getModel(), true);
-                    recogEngine.processImage(fingerModel);
+                    fingerEngine.processImage(fingerModel);
 
                     runOnUiThread(() -> progressBar.setMessage("Matching Data..."));
 
-                    float v2 = recogEngine.fingerAPIAuthentication(fingerModel, fingerModels, 0, new JSONObject(), "", null);
+                    float v2 = fingerEngine.fingerAuthentication(fingerModel, fingerModels, new JSONObject());
 
                     runOnUiThread(() -> {
                         AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
                         builder1.setTitle("Hello " + fingerModel.getUserName() + ",");
-                        builder1.setMessage(fingerModel.getStringsOld()[0]);
+                        builder1.setMessage(fingerModel.getStrings()[0]);
                         builder1.setPositiveButton(
                                 "OK",
                                 (dialog, id) -> {

@@ -76,7 +76,7 @@ public class HorizontalProgressView extends ProgressBar {
   private Paint mNormalPaint;
   private Paint mReachPaint;
   /**
-   * 经过测量后得到的需要绘制的总宽度
+   * The total width to be drawn after measurement
    */
   private int mDrawWidth;
 
@@ -91,7 +91,7 @@ public class HorizontalProgressView extends ProgressBar {
   public HorizontalProgressView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     obtainAttributes(attrs);
-    // 初始化画笔
+    // Initialize brush
     initPaint();
   }
 
@@ -101,7 +101,7 @@ public class HorizontalProgressView extends ProgressBar {
     mTextPaint.setStyle(Paint.Style.FILL);
     mTextPaint.setTextSize(mTextSize);
     mTextPaint.setTextSkewX(mTextSkewX);
-    mTextPaint.setAntiAlias(true); // 抗锯齿
+    mTextPaint.setAntiAlias(true); // Anti-aliasing
 
     mNormalPaint = new Paint();
     mNormalPaint.setColor(mNormalBarColor);
@@ -117,7 +117,7 @@ public class HorizontalProgressView extends ProgressBar {
   }
 
   /**
-   * 获取自定义属性值
+   * Get custom attribute value
    */
   protected void obtainAttributes(AttributeSet attrs) {
 //    TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.HorizontalProgressView);
@@ -161,7 +161,7 @@ public class HorizontalProgressView extends ProgressBar {
         + getPaddingBottom();
     heightSize = resolveSize(heightSize, heightMeasureSpec);
     setMeasuredDimension(widthSize, heightSize);
-    // 实际绘制宽度
+    // Actual drawing width
     mDrawWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
   }
 
@@ -189,7 +189,7 @@ public class HorizontalProgressView extends ProgressBar {
     int remainingSize = (canvasWidth * remainingProgress) / 100;
 //    int cornerRadius = CornerRadius(dp2px(getContext(), 2), dp2px(getContext(), 2));
 
-    boolean needDrawUnReachArea = true; //是否需要绘制未到达进度
+    boolean needDrawUnReachArea = true; //Whether it is necessary to draw the unreached progress
     float textWidth = 0;
     String text = mTextPrefix + getProgress() + mTextSuffix;
     if (mTextVisible) {
@@ -206,19 +206,19 @@ public class HorizontalProgressView extends ProgressBar {
       needDrawUnReachArea = false;
     }
 
-    // 绘制已到达进度
+    //Drawing has reached progress
     float endX = progressPosX - mTextOffset / 2;
     if (endX > 0) {
       canvas.drawLine(0, 0, endX, 0, mReachPaint);
     }
 
-    // 绘制未到达进度
+    // Drawing has not reached progress
     if (needDrawUnReachArea) {
       float start = progressPosX + mTextOffset / 2 + textWidth;
       canvas.drawLine(start, 0, mDrawWidth, 0, mNormalPaint);
     }
 
-    // 绘制字体
+    // draw font
     if (!mTextVisible) {
       return;
     }
@@ -353,17 +353,17 @@ public class HorizontalProgressView extends ProgressBar {
   }
 
   /**
-   * @param progress 进度值
-   * @param duration 动画播放时间
+   * @param progress progress value
+   * @param duration animation play time
    */
   public void setProgressInTime(final int progress, final long duration) {
     setProgressInTime(progress, getProgress(), duration);
   }
 
   /**
-   * @param startProgress 起始进度
-   * @param progress 进度值
-   * @param duration 动画播放时间
+   * @param startProgress Starting progress
+   * @param progress progress value
+   * @param duration animation play time
    */
   public void setProgressInTime(int startProgress, final int progress, final long duration) {
     ValueAnimator valueAnimator = ValueAnimator.ofInt(startProgress, progress);
@@ -371,7 +371,7 @@ public class HorizontalProgressView extends ProgressBar {
 
       @Override
       public void onAnimationUpdate(ValueAnimator animator) {
-        //获得当前动画的进度值，整型，1-100之间
+        //Get the progress value of the current animation, integer, between 1-100
         int currentValue = (Integer) animator.getAnimatedValue();
         setProgress(currentValue);
       }
@@ -386,7 +386,7 @@ public class HorizontalProgressView extends ProgressBar {
   public Parcelable onSaveInstanceState() {
     final Bundle bundle = new Bundle();
     bundle.putParcelable(STATE, super.onSaveInstanceState());
-    // 保存text信息
+    // Save text information
     bundle.putInt(TEXT_COLOR, getTextColor());
     bundle.putInt(TEXT_SIZE, getTextSize());
     bundle.putInt(TEXT_OFFSET, getTextOffset());
@@ -395,11 +395,11 @@ public class HorizontalProgressView extends ProgressBar {
     bundle.putBoolean(TEXT_VISIBLE, isTextVisible());
     bundle.putString(TEXT_SUFFIX, getTextSuffix());
     bundle.putString(TEXT_PREFIX, getTextPrefix());
-    // 保存已到达进度信息
+    // Save progress information reached
     bundle.putInt(REACH_BAR_COLOR, getReachBarColor());
     bundle.putInt(REACH_BAR_SIZE, getReachBarSize());
 
-    // 保存未到达进度信息
+    // Save unreached progress information
     bundle.putInt(NORMAL_BAR_COLOR, getNormalBarColor());
     bundle.putInt(NORMAL_BAR_SIZE, getNormalBarSize());
     return bundle;

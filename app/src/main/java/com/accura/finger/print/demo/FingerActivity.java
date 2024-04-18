@@ -4,7 +4,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import com.accura.finger.print.demo.customView.SemiCircleView;
+import com.accura.finger.print.demo.database.DatabaseHelper;
 import com.accura.finger.print.sdk.CameraView;
 import com.accura.finger.print.sdk.interfaces.FingerCallback;
 import com.accura.finger.print.sdk.model.FingerModel;
@@ -28,6 +28,10 @@ import com.accura.finger.scan.FingerEngine;
 import com.accura.finger.scan.RecogType;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class FingerActivity extends SensorsActivity implements FingerCallback {
 
@@ -37,15 +41,15 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
     private HorizontalProgressView tvProgress;
     RecogType recogType;
     private ViewGroup ocr_frame;
-    private String fingerType = "enroll";
+    private String fingerType = FingerEngine.FINGER_ENROLL;
     private String userName;
     int progress = 0;
     private long uniqueId;
-    private int companyId = -1;
     private String uniqueName;
-    private int fingerSideType = 0;
+    private int fingerSideType;
     private ImageView imHintSmall;
     private boolean hideAnim = false;
+    private DatabaseHelper dbHelper;
 
     private static class MyHandler extends Handler {
         private final WeakReference<FingerActivity> mActivity;
@@ -62,36 +66,20 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
                 if (msg.obj instanceof String) s = (String) msg.obj;
                 switch (msg.what) {
                     case 1:
-                        if (s.contains("%")) {
-                            s = s.substring(0, s.indexOf("."));
-                            activity.progress = Integer.parseInt(s);
-                            activity.tvProgress.setProgress(activity.progress);
+                        activity.tvTitle.setText(s);
+                        break;
+                    case 2:
+                        if (msg.obj instanceof Float) {
+                            float progress = ((Float) msg.obj);
+                            activity.progress = (int) progress;
                         }
-                        else {
-                            if (!TextUtils.isEmpty(s) && (!s.contains("011") && !s.contains("111")) && !activity.hideAnim) {
-                                activity.hideAnim = true;
-                                activity.imHintSmall.setVisibility(View.GONE);
-                            }
-                            if (s.isEmpty()) {
-                                activity.tvTitle.setText(s);
-                            } else if (s.contains("011")) {
-                                if (activity.fingerSideType == 1) {
-                                    activity.tvTitle.setText(R.string.info_right_msg);
-                                    break;
-                                }
-                                activity.tvTitle.setText(R.string.info_msg);
-                            } else if (s.contains("111")) {
-                                if (s.equalsIgnoreCase("1111")) {
-                                    activity.hideAnim = false;
-                                    activity.imHintSmall.setVisibility(View.VISIBLE);
-                                }
-                                activity.tvTitle.setText(R.string.keep_distance);
-                            } else if (s.equalsIgnoreCase("211")) {
-                                activity.tvTitle.setText(R.string.away_message);
-                            } else if (s.equalsIgnoreCase("311")) {
-                                activity.tvTitle.setText(R.string.closer_msg);
-                            } else activity.tvTitle.setText(R.string.finger_error_msg);
-                        }
+                        activity.tvProgress.setProgress(activity.progress);
+                        break;
+                    case 3:
+                        if (msg.obj instanceof Boolean) activity.hideAnim = (Boolean) msg.obj;
+                        if (activity.hideAnim) {
+                            activity.imHintSmall.setVisibility(View.VISIBLE);
+                        } else activity.imHintSmall.setVisibility(View.GONE);
                         break;
                     default: break;
                 }
@@ -109,14 +97,14 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
         setContentView(R.layout.ocr_activity);
 
         recogType = RecogType.detachFrom(getIntent());
-        fingerType = getIntent().getStringExtra("finger_type");
+        fingerType = getIntent().getStringExtra("finger_scan_type");
         userName = getIntent().getStringExtra("user_name");
         uniqueId = getIntent().getLongExtra("unique_id", -1); // for local database
         uniqueName = getIntent().getStringExtra("unique_name");
-        fingerSideType = getIntent().getIntExtra("left_right_type", 0);
+        fingerSideType = getIntent().getIntExtra("left_right_type", FingerEngine.LEFT_HAND);
 
         AccuraFingerLog.loge(TAG, "RecogType " + recogType);
-
+        if (this.dbHelper == null) this.dbHelper = new DatabaseHelper(this);
         init();
         initCamera();
     }
@@ -137,14 +125,14 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
         cameraView = new CameraView(this);
         if (recogType == RecogType.FINGER_PRINT) {
             cameraView.setFingerType(fingerType, fingerSideType);
-            cameraView.setName(userName);
+            cameraView.setUserName(userName);
         }
         cameraView.setRecogType(recogType)
                 .setFrameView(ocr_frame)
                 .setFlashMode(CameraView.FLASH_MODE_ON)
                 .setView(linearLayout) // To add camera view
                 .setCameraFacing(0) // To set front or back camera.
-                .setOcrCallback(this)  // To get Update and Success Call back
+                .setFingerCallback(this)  // To get Update and Success Call back
                 .setStatusBarHeight(statusBarHeight)  // To remove Height from Camera View if status bar visible
 //                optional field
 //                .setEnableMediaPlayer(false) // false to disable sound and true to enable sound and default it is true
@@ -169,27 +157,34 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
         tvTitle = findViewById(R.id.tv_title);
         tvScanMessage = findViewById(R.id.tv_scan_msg1);
         tvProgress = findViewById(R.id.tv_progress);
+
         ocr_frame = findViewById(R.id.ocr_frame);
+
         DisplayMetrics dm = getResources().getDisplayMetrics();
         int width = dm.widthPixels;
         int height = dm.heightPixels;
+
         float halfH = (height *0.11f);
         height -= (2*halfH);
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ocr_frame.getLayoutParams();
-        if (fingerSideType == 1) {
-            layoutParams.leftMargin = (int) (width*0.08f);
-        }
-        layoutParams.width = (int) (width-(width*0.08f));
-        layoutParams.height = height;
 
-        ocr_frame.setLayoutParams(layoutParams);
+        // set Progress View Layout Params
         RelativeLayout.LayoutParams tvlp = (RelativeLayout.LayoutParams) tvProgress.getLayoutParams();
-        if (fingerSideType == 1) {
+        if (fingerSideType == FingerEngine.RIGHT_HAND) {
             tvlp.leftMargin = (int) (width*0.08f);
         }
         tvlp.width = (int) (width-(width*0.08f));
         tvProgress.setLayoutParams(tvlp);
 
+        // set Frame Layout Params
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ocr_frame.getLayoutParams();
+        if (fingerSideType == FingerEngine.RIGHT_HAND) {
+            layoutParams.leftMargin = (int) (width*0.08f);
+        }
+        layoutParams.width = (int) (width-(width*0.08f));
+        layoutParams.height = height;
+        ocr_frame.setLayoutParams(layoutParams);
+
+        // Access all 4 Sub Layout of layout Params
         ImageView imIndex = (ImageView) ocr_frame.getChildAt(0);
 
         ImageView imMiddle = (ImageView) ocr_frame.getChildAt(1);
@@ -200,7 +195,7 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
 
         imHintSmall = findViewById(R.id.im_hint_small);
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) imHintSmall.getLayoutParams();
-        if (fingerSideType == 1) {
+        if (fingerSideType == FingerEngine.RIGHT_HAND) {
             params.leftMargin = dp2px(10);
             imHintSmall.setRotationY(180);
             tvTitle.setText(R.string.info_right_msg);
@@ -265,16 +260,27 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
         AccuraFingerLog.loge(TAG, "onScannedComplete: ");
         if (result != null && recogType == RecogType.FINGER_PRINT) {
             Runnable runnable = () -> {
-                if (fingerType.equals("enroll")) {
-                    FingerModel.setModel((FingerModel) result);
+                if (fingerType.equals(FingerEngine.FINGER_ENROLL)) {
+                    List<?> list = new ArrayList<>();
+                    if (result.getClass().isArray() ) {
+                        list = Arrays.asList((Object[])result);
+                    } else if (result instanceof Collection) {
+                        list = new ArrayList<>((Collection<?>) result);
+                    }
+                    long uniqueID = -1;
+                    FingerModel fingerModel = null;
+                    for (Object o : list) {
+                        fingerModel = (FingerModel) o;
+                        uniqueID = dbHelper.addUser(fingerModel, uniqueID);
+                    }
+                    FingerModel.setModel(fingerModel);
                     Intent intent = getIntent();
-                    intent.putExtra("uniqueID", ((FingerModel) result).getUniqueID());
+                    intent.putExtra("uniqueID", uniqueID);
                     setResult(RESULT_OK);
                     finish();
-                } else {
+                } else if (result instanceof FingerModel){
                     ((FingerModel) result).setUserName(uniqueName); // set enrolled user name to match with
                     ((FingerModel) result).setUniqueID(uniqueId); // set enrolled user name to match with
-                    ((FingerModel) result).setCompanyID(companyId); // set enrolled user name to match with
                     FingerModel.setModel((FingerModel) result);
                     Intent intent = getIntent();
                     intent.putExtra("uniqueID", ((FingerModel) result).getUniqueID());
@@ -287,15 +293,15 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
     }
 
     /**
-     * @param titleCode to display scan card message on top of border Frame
+     * @param titleCode
      *
      * @param errorMessage To display process message.
      *                null if message is not available
-     * @param isFlip  To set your customize animation after complete front scan
+     * @param isShowAnim  To set your customize animation after for hint
      */
     @Override
-    public void onProcessUpdate(int titleCode, String errorMessage, boolean isFlip) {
-        AccuraFingerLog.loge(TAG, "onProcessUpdate :-> " + titleCode + "," + errorMessage + "," + isFlip);
+    public void onProcessUpdate(int titleCode, String errorMessage, boolean isShowAnim) {
+        AccuraFingerLog.loge(TAG, "onProcessUpdate :-> " + titleCode + "," + errorMessage + "," + isShowAnim);
         Message message;
 
         if (errorMessage != null) {
@@ -303,22 +309,39 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
             message.what = 1;
             message.obj = getErrorMessage(errorMessage);
             handler.sendMessage(message);
-//            tvScanMessage.setText(message);
+        } else {
+            message = new Message();
+            message.what = 3;
+            message.obj = isShowAnim;
+            handler.sendMessage(message);
         }
-
     }
 
     private String getErrorMessage(String s) {
         switch (s) {
-            case FingerEngine.ACCURA_ERROR_CODE_MOTION:
-                return "Keep Document Steady";
-            case FingerEngine.ACCURA_ERROR_CODE_PROCESSING:
-                return "Processing...";
-            case FingerEngine.ACCURA_ERROR_CODE_BLUR_DOCUMENT:
-                return "Blur detect in document";
+            case FingerEngine.ACCURA_ERROR_CODE_RIGHT_HAND:
+                return getResources().getString(R.string.info_right_msg);
+            case FingerEngine.ACCURA_ERROR_CODE_LEFT_HAND:
+                return getResources().getString(R.string.info_msg);
+            case FingerEngine.ACCURA_ERROR_CODE_KEEP_DISTANCE:
+                return getResources().getString(R.string.keep_distance);
+            case FingerEngine.ACCURA_ERROR_CODE_AWAY:
+                return getResources().getString(R.string.away_message);
+            case FingerEngine.ACCURA_ERROR_CODE_CLOSER:
+                return getResources().getString(R.string.closer_msg);
+            case FingerEngine.ACCURA_ERROR_CODE_MESSAGE:
+                return getResources().getString(R.string.finger_error_msg);
             default:
                 return s;
         }
+    }
+
+    @Override
+    public void onProgress(float progress) {
+        Message message = new Message();
+        message.what = 2;
+        message.obj = progress;
+        handler.sendMessage(message);
     }
 
     @Override

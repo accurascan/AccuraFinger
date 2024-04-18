@@ -12,6 +12,8 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.accura.finger.scan.FingerEngine;
+
 public class SemiCircleView extends FrameLayout {
     private final static float CORNER_RADIUS = 50.0f; //card radius change accordingly
     private float cornerRadius;
@@ -20,7 +22,7 @@ public class SemiCircleView extends FrameLayout {
     private Paint mSemiBlackPaint;
     private Path mPath = new Path();
     private Paint mBorderPaint;
-    private int fingerSideType = 0;
+    private int fingerSideType = FingerEngine.LEFT_HAND;
 
     public SemiCircleView(Context context) {
         super(context);
@@ -58,7 +60,7 @@ public class SemiCircleView extends FrameLayout {
     public RectF myOval(float width, float height, float x, float y){
         float halfW = width / 2;
         float halfH = (height *0.11f);/// 2;
-        if (fingerSideType == 1) {
+        if (fingerSideType == FingerEngine.RIGHT_HAND) {
             return new RectF(width*0.08f,  halfH, width+10, height-halfH);
         }
         return new RectF(x-10,  halfH, width-(width*0.08f), height-halfH);
@@ -69,22 +71,10 @@ public class SemiCircleView extends FrameLayout {
     protected void dispatchDraw(Canvas canvas) {
         int count = canvas.save();
 
-//        final Path path = new Path();
-//        path.addRoundRect(new RectF(0, 0, canvas.getWidth(), canvas.getHeight()), cornerRadius, cornerRadius, Path.Direction.CW);
-//        canvas.clipPath(path, Region.Op.INTERSECT);
-//
-//        canvas.clipPath(path);
-//        super.dispatchDraw(canvas);
-//        canvas.restoreToCount(count);
-
         mPath.reset();
 
-//        mPath.addCircle(canvas.getWidth() / 2, canvas.getHeight() / 2, 550, Path.Direction.CW);
         mPath.addRect(myOval(canvas.getWidth(), canvas.getHeight(), 0, 0), Path.Direction.CW);
         mPath.setFillType(Path.FillType.INVERSE_WINDING);
-//        canvas.clipPath(mPath, Region.Op.INTERSECT);
-
-//        canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2, 550, mTransparentPaint);
 
         canvas.drawRect(myOval(canvas.getWidth(), canvas.getHeight(), 0, 0), mTransparentPaint);
         canvas.drawRect(myOval(canvas.getWidth(), canvas.getHeight(), 0, 0), mBorderPaint);
