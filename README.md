@@ -49,7 +49,7 @@ Below steps to setup AccuraScan's Finger SDK to your project.
 
         coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
         // Accura Finger
-        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.3'
+        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.5'
     }
 
 #### Step 4: Add files to project assets folder:
