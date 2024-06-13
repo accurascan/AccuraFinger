@@ -39,6 +39,7 @@ android {
             universalApk true
         }
     }
+    namespace 'com.accura.finger.print.demo'
 }
 
 dependencies {
