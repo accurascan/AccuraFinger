@@ -58,8 +58,8 @@ Below steps to setup AccuraScan's Finger SDK to your project.
     - key.license
     Generate your Accura license from https://accurascan.com/developer/dashboard
 
-## 1. Setup Accura OCR
-* Require `key.license` to implement Accura OCR in to your app
+## 1. Setup Accura Finger
+* Require `key.license` to implement Accura Finger SDK in to your app
 #### Step 1 : To initialize sdk on app start:
 
     FingerEngine fingerEngine = new FingerEngine();
@@ -71,7 +71,7 @@ Below steps to setup AccuraScan's Finger SDK to your project.
 
 #### Step 2 : Set CameraView
 ```
-Must have to extend com.accurascan.ocr.mrz.motiondetection.SensorsActivity to your activity.
+Must have to extend com.accura.finger.print.sdk.motiondetection.SensorsActivity to your activity.
 - Make sure your activity orientation locked from Manifest. Because auto rotate not support.
 
 private CameraView cameraView;
@@ -112,8 +112,8 @@ private void initCamera() {
             .setFrameView(ocr_frame) // make sure ocr_frame 4 child layout same as used in this demo app
             .setFlashMode(CameraView.FLASH_MODE_ON) // CameraView.FLASH_MODE_OFF
             .setView(linearLayout) // To add camera view
-            .setCameraFacing(0) // // To set selfie(1) or rear(0) camera.
-            .setFingerCallback(this)  // To get feedback and Success Call back
+            .setCameraFacing(0) // To set selfie(1) or rear(0) camera.
+            .setFingerCallback(this)  // To get scanning status
             .setStatusBarHeight(statusBarHeight)  // To remove Height from Camera View if status bar visible
 //                Optional setup
 //                .setEnableMediaPlayer(false) // false to disable default sound and true to enable sound and default it is true
@@ -160,6 +160,9 @@ public void onUpdateLayout(int width, int height) {
 
 /**
  * Override this method after scan complete to get data
+ * @param result   Getting scanned finger data
+ * FingerEngine.FINGER_ENROLL - List of FingerModel to enroll user
+ * FingerEngine.FINGER_VERIFY - Single object of FingerModel to verify user with enrolled users
  */
 @Override
 public void onScannedComplete(Object result) {
@@ -168,7 +171,6 @@ public void onScannedComplete(Object result) {
     if (result != null && recogType == RecogType.FINGER_PRINT) {
     	// make sure release camera view before open result screen
     	// if (cameraView != null) cameraView.release(true);
-        // Do some code for display data
         FingerEngine fingerEngine = new FingerEngine();
         Runnable runnable = () -> {
             if (fingerType.equals(FingerEngine.FINGER_ENROLL)) {
@@ -239,15 +241,12 @@ public void onScannedComplete(Object result) {
 }
 
 /**
- * @param titleCode to display scan card message on top of border Frame
- *
  * @param errorMessage To display process message.
  *                null if message is not available
- * @param isFlip  true to set your customize animation for scan back card alert after complete front scan
- *                and also used cameraView.flipImage(ImageView) for default animation
+ * @param isShowAnim  To set your custom animation
  */
 @Override
-public void onProcessUpdate(int titleCode, String errorMessage, boolean isFlip) {
+public void onProcessUpdate(int titleCode, String errorMessage, boolean isShowAnim) {
 // make sure update view on ui thread
     runOnUiThread(new Runnable() {
         @Override
@@ -257,10 +256,29 @@ public void onProcessUpdate(int titleCode, String errorMessage, boolean isFlip) 
             if (errorMessage != null) {
                 Toast.makeText(context, getErrorMessage(errorMessage), Toast.LENGTH_SHORT).show(); // display message
             } else {
-                // show/hide animation if finger are not in camera
+                Log.e(TAG, isShowAnim); // show/hide animation
             }
         }
     });
+}
+
+private String getErrorMessage(String s) {
+    switch (s) {
+        case FingerEngine.ACCURA_ERROR_CODE_RIGHT_HAND:
+            return "Please place right hand 4 fingers in frame;
+        case FingerEngine.ACCURA_ERROR_CODE_LEFT_HAND:
+            return "Please place left hand 4 fingers in frame";
+        case FingerEngine.ACCURA_ERROR_CODE_KEEP_DISTANCE:
+            return "Keep distance between Fingers;
+        case FingerEngine.ACCURA_ERROR_CODE_AWAY:
+            return "Keep fingers slightly away from the Camera";
+        case FingerEngine.ACCURA_ERROR_CODE_CLOSER:
+            return "Keep fingers close to the Camera;
+        case FingerEngine.ACCURA_ERROR_CODE_MESSAGE:
+            return "Move and place your fingers properly";
+        default:
+            return s;
+    }
 }
 
 @Override
@@ -271,9 +289,9 @@ public void onProgress(float progress) {
 
 @Override
 public void onError(String errorMessage) {
-    // display data on ui thread
-    // stop ocr if failed
-    Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+    // Scanning is getting stop
+    Runnable runnable = () -> Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
+    runOnUiThread(runnable);
 }
 ```
 

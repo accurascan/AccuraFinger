@@ -297,7 +297,7 @@ public class FingerActivity extends SensorsActivity implements FingerCallback {
      *
      * @param errorMessage To display process message.
      *                null if message is not available
-     * @param isShowAnim  To set your customize animation after for hint
+     * @param isShowAnim  To set your custom animation
      */
     @Override
     public void onProcessUpdate(int titleCode, String errorMessage, boolean isShowAnim) {
