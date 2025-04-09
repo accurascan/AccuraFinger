@@ -15,7 +15,7 @@
         android:paddingStart="@dimen/_10dp"
         android:paddingEnd="@dimen/_10dp">
 
-        <com.accura.finger.print.demo.customview.CustomTextView
+        <TextView
             android:id="@+id/tv_key"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,8 +26,7 @@
             android:textSize="15sp"
             android:singleLine="false"
             android:text="dsfdgfdgd"
-            android:textAllCaps="true"
-            app:typeface="ALLER_STD_REG"/>
+            android:textAllCaps="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,7 +45,7 @@
                 android:layout_centerInParent="true"
                 />
 
-            <com.accura.finger.print.demo.customview.CustomTextView
+            <TextView
                 android:id="@+id/tv_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,7 +53,6 @@
                 android:layout_centerInParent="true"
                 android:textColor="@color/colorAccent"
                 android:textSize="18sp"
-                app:typeface="ALLER_STD_REG"
                 android:minHeight="40dp"/>
 
         </LinearLayout>
@@ -93,7 +91,7 @@
                 android:layout_centerInParent="true"
                 />
 
-<!--            <com.accura.finger.print.demo.customview.CustomTextView-->
+<!--            <TextView-->
 <!--                android:id="@+id/tv_value_white"-->
 <!--                android:layout_width="match_parent"-->
 <!--                android:layout_height="wrap_content"-->
@@ -101,7 +99,6 @@
 <!--                android:layout_centerInParent="true"-->
 <!--                android:textColor="@color/colorAccent"-->
 <!--                android:textSize="15sp"-->
-<!--                app:typeface="ALLER_STD_REG"-->
 <!--                android:minHeight="40dp"/>-->
 
         </LinearLayout>

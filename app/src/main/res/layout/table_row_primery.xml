@@ -6,7 +6,7 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <com.accura.finger.print.demo.customview.CustomTextView
+    <TextView
         android:id="@+id/tv_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,10 +16,9 @@
         android:text="dsfdgfdgd"
         android:background="@color/grey"
         android:textColor="@color/black"
-        android:textSize="15sp"
-        app:typeface="ALLER_STD_REG" />
+        android:textSize="15sp" />
 
-    <com.accura.finger.print.demo.customview.CustomTextView
+    <TextView
         android:id="@+id/tv_type1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,8 +30,7 @@
         android:singleLine="false"
         android:text="dsfdgfdgd"
         android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:typeface="ALLER_STD_REG" />
+        android:textSize="15sp" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,7 +50,7 @@
             android:layout_weight="1"
             android:minHeight="100dp" />
 
-        <com.accura.finger.print.demo.customview.CustomTextView
+        <TextView
             android:id="@+id/tv_name1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -62,8 +60,7 @@
             android:text="dsfdgfdgd"
             android:textAllCaps="true"
             android:textColor="@color/colorAccent"
-            android:textSize="15sp"
-            app:typeface="ALLER_STD_REG" />
+            android:textSize="15sp" />
     </LinearLayout>
 <!--    <View-->
 <!--        android:layout_width="match_parent"-->
@@ -96,7 +93,7 @@
             android:layout_weight="1"
             android:minHeight="100dp" />
 
-<!--        <com.accura.finger.print.demo.customview.CustomTextView-->
+<!--        <TextView-->
 <!--            android:id="@+id/tv_name12"-->
 <!--            android:layout_width="0dp"-->
 <!--            android:layout_height="wrap_content"-->
@@ -106,15 +103,14 @@
 <!--            android:text="dsfdgfdgd"-->
 <!--            android:textAllCaps="true"-->
 <!--            android:textColor="@color/colorAccent"-->
-<!--            android:textSize="15sp"-->
-<!--            app:typeface="ALLER_STD_REG" />-->
+<!--            android:textSize="15sp" />-->
     </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#AEADAD" />
 
-    <com.accura.finger.print.demo.customview.CustomTextView
+    <TextView
         android:id="@+id/tv_type2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -126,8 +122,7 @@
         android:singleLine="false"
         android:text="dsfdgfdgd"
         android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:typeface="ALLER_STD_REG" />
+        android:textSize="15sp" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -146,7 +141,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:minHeight="100dp" />
-        <com.accura.finger.print.demo.customview.CustomTextView
+        <TextView
             android:id="@+id/tv_name2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -156,8 +151,7 @@
             android:text="dsfdgfdgd"
             android:textAllCaps="true"
             android:textColor="@color/colorAccent"
-            android:textSize="15sp"
-            app:typeface="ALLER_STD_REG" />
+            android:textSize="15sp" />
 
     </LinearLayout>
 <!--    <View-->
@@ -189,7 +183,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:minHeight="100dp" />
-<!--        <com.accura.finger.print.demo.customview.CustomTextView-->
+<!--        <TextView-->
 <!--            android:id="@+id/tv_name22"-->
 <!--            android:layout_width="0dp"-->
 <!--            android:layout_height="wrap_content"-->
@@ -199,8 +193,7 @@
 <!--            android:text="dsfdgfdgd"-->
 <!--            android:textAllCaps="true"-->
 <!--            android:textColor="@color/colorAccent"-->
-<!--            android:textSize="15sp"-->
-<!--            app:typeface="ALLER_STD_REG" />-->
+<!--            android:textSize="15sp" />-->
 
     </LinearLayout>
     <View
@@ -208,7 +201,7 @@
         android:layout_height="1dp"
         android:background="#AEADAD" />
 
-    <com.accura.finger.print.demo.customview.CustomTextView
+    <TextView
         android:id="@+id/tv_type3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -220,8 +213,7 @@
         android:singleLine="false"
         android:text="dsfdgfdgd"
         android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:typeface="ALLER_STD_REG" />
+        android:textSize="15sp" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -240,7 +232,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:minHeight="100dp" />
-        <com.accura.finger.print.demo.customview.CustomTextView
+        <TextView
             android:id="@+id/tv_name3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -250,8 +242,7 @@
             android:text="dsfdgfdgd"
             android:textAllCaps="true"
             android:textColor="@color/colorAccent"
-            android:textSize="15sp"
-            app:typeface="ALLER_STD_REG" />
+            android:textSize="15sp" />
 
     </LinearLayout>
 <!--    <View-->
@@ -282,7 +273,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:minHeight="100dp" />
-<!--        <com.accura.finger.print.demo.customview.CustomTextView-->
+<!--        <TextView-->
 <!--            android:id="@+id/tv_name32"-->
 <!--            android:layout_width="0dp"-->
 <!--            android:layout_height="wrap_content"-->
@@ -292,8 +283,7 @@
 <!--            android:text="dsfdgfdgd"-->
 <!--            android:textAllCaps="true"-->
 <!--            android:textColor="@color/colorAccent"-->
-<!--            android:textSize="15sp"-->
-<!--            app:typeface="ALLER_STD_REG" />-->
+<!--            android:textSize="15sp" />-->
 
     </LinearLayout>
     <View
@@ -301,7 +291,7 @@
         android:layout_height="1dp"
         android:background="#AEADAD" />
 
-    <com.accura.finger.print.demo.customview.CustomTextView
+    <TextView
         android:id="@+id/tv_type4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -313,8 +303,7 @@
         android:singleLine="false"
         android:text="dsfdgfdgd"
         android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:typeface="ALLER_STD_REG" />
+        android:textSize="15sp" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -334,7 +323,7 @@
             android:layout_weight="1"
             android:minHeight="100dp" />
 
-        <com.accura.finger.print.demo.customview.CustomTextView
+        <TextView
             android:id="@+id/tv_name4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -344,8 +333,7 @@
             android:text="dsfdgfdgd"
             android:textAllCaps="true"
             android:textColor="@color/colorAccent"
-            android:textSize="15sp"
-            app:typeface="ALLER_STD_REG" />
+            android:textSize="15sp" />
     </LinearLayout>
 <!--    <View-->
 <!--        android:layout_width="match_parent"-->
@@ -377,7 +365,7 @@
             android:layout_weight="1"
             android:minHeight="100dp" />
 
-<!--        <com.accura.finger.print.demo.customview.CustomTextView-->
+<!--        <TextView-->
 <!--            android:id="@+id/tv_name42"-->
 <!--            android:layout_width="0dp"-->
 <!--            android:layout_height="wrap_content"-->
@@ -387,8 +375,7 @@
 <!--            android:text="dsfdgfdgd"-->
 <!--            android:textAllCaps="true"-->
 <!--            android:textColor="@color/colorAccent"-->
-<!--            android:textSize="15sp"-->
-<!--            app:typeface="ALLER_STD_REG" />-->
+<!--            android:textSize="15sp" />-->
     </LinearLayout>
     <View
         android:layout_width="match_parent"

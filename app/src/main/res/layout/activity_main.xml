@@ -40,7 +40,6 @@
                 android:textSize="18sp"
                 android:checked="true"
                 android:layout_weight="1"
-                app:typeface="ALLER_STD_REG"
                 android:onClick="selectHand"/>
             <CheckBox
                 android:id="@+id/right_check"
@@ -53,7 +52,6 @@
                 android:textSize="18sp"
                 android:checked="false"
                 android:layout_weight="1"
-                app:typeface="ALLER_STD_REG"
                 android:onClick="selectHand" />
         </LinearLayout>
         <androidx.core.widget.NestedScrollView
