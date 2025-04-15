@@ -49,7 +49,7 @@ Below steps to setup AccuraScan's Finger SDK to your project.
 
         coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
         // Accura Finger
-        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.7'
+        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.8'
     }
 
 #### Step 4: Add files to project assets folder:
@@ -180,60 +180,49 @@ public void onScannedComplete(Object result) {
                 } else if (result instanceof Collection) {
                     list = new ArrayList<>((Collection<?>) result);
                 }
-                long uniqueID = -1;
+                List<FingerModel> fingerModels = new ArrayList<>();
                 FingerModel fingerModel = null;
                 for (Object o : list) {
                     fingerModel = (FingerModel) o;
-                    uniqueID = dbHelper.addUser(fingerModel, uniqueID);
+                    fingerModels.add(fingerModel );
                 }
-                
-                // Access data from database
-                List<FingerModel> fingerModels = dbhelper.getUserByUniqueID(fingerModel);
-                
-                // Proccsing fingerprint images
-                fingerEngine.processImage(fingerModels);
-                
-                // To manage local database
-                for (FingerModel model : fingerModels){
-                    dbhelper.updateFeatures(model);
-                }
-                
-                
-                boolean isValid = fingerEngine.fingerValidation(fingerModels, 0);
-                if (isValid) {
-                    Toast.makeText(this, "Enrollment Failed, Bad Prints Detected", Toast.LENGTH_SHORT).show()
-                    
-                    // delete user from local database
-                    for (FingerModel model : fingerModels){
-                        dbhelper.deleteUser(model);
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new FingerEngine().processImage(fingerModels);
+                        
+                        boolean isValid = fingerEngine.fingerValidation(fingerModels, 0);
+                        if (isValid) {
+                            runOnUiThread(() -> Toast.makeText(context, "Enrollment Failed, Bad Prints Detected", Toast.LENGTH_SHORT).show());
+                            return;
+                        }
+                        
+                        // check with database that user is already added or not
+                        List<FingerModel> fingerUserList; // list of all users
+                        JSONObject object = new JSONObject();
+                        boolean _isValid = fingerEngine.checkingEnrollment(fingerModels, fingerUserList, object);
+                        runOnUiThread(() -> {
+                            if (_isValid) {
+                                Toast.makeText(context, "Member successfully added", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, "Enrollment failed, Found duplicate with " + object.getString("name"), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                    return;
-                }
-                List<FingerModel> fingerAPIModels = dbhelper.getAllUser(fingerModels.get(0), false);
-
-                JSONObject object = new JSONObject();
-                boolean _isValid = fingerEngine.checkingEnrollment(fingerModels, fingerAPIModels, object);
-                if (_isValid) {
-                    Toast.makeText(this, "Member successfully added", Toast.LENGTH_SHORT).show()
-                } else {
-                    // delete user from local database
-                    for (FingerModel model : fingerModels){
-                        dbhelper.deleteUser(model);
-                    }
-                    Toast.makeText(this, "Enrollment failed, Found duplicate with " + object.getString("name"), Toast.LENGTH_SHORT).show()
-                }
-                
+                });
+                thread.start();
             } else if (result instanceof FingerModel) {
-                ((FingerModel) result).setUserName(uniqueName); // set enrolled user name to match with
-                ((FingerModel) result).setUniqueID(uniqueId); // set enrolled unique Id to match with
-                FingerModel.setModel((FingerModel) result);
-                
-                fingerEngine.processImage(fingerModel);
-                List<FingerModel> fingerModels = new DatabaseHelper(FingerActivity.this).getAllUser(fingerModel, true);
-                float v2 = fingerEngine.fingerAuthentication(fingerModel, fingerModels, 0, new JSONObject(), "", null);
-                
-                Toast.makeText(this, "Hello " + fingerModel.getUserName() + ",\n" + fingerModel.getStrings()[0], Toast.LENGTH_SHORT).show();
-                
+                new Thread(new Runnable() {
+                    public void run() {
+                        FingerModel fingerModel = (FingerModel) result;
+                        new FingerEngine().processImage(fingerModel);
+                        // enrolled user details
+                        List<FingerModel> fingerModels;
+                        float v2 = fingerEngine.fingerAuthentication(fingerModel, fingerModels, new JSONObject());
+                        String result = fingerModel.getStrings()[0]; // "Pass" or "Fail"
+                        runOnUiThread(() -> Toast.makeText(context, "Hello " + fingerModel.getUserName() + ",\n" + result, Toast.LENGTH_SHORT).show());
+                    }
+                }).start();
             }
         };
         runOnUiThread(runnable);
