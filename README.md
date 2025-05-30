@@ -49,7 +49,7 @@ Below steps to setup AccuraScan's Finger SDK to your project.
 
         coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
         // Accura Finger
-        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.7'
+        implementation 'com.github.accurascan:AccuraFingerSDK:1.0.9'
     }
 
 #### Step 4: Add files to project assets folder:
@@ -59,7 +59,7 @@ Below steps to setup AccuraScan's Finger SDK to your project.
     Generate your Accura license from https://accurascan.com/developer/dashboard
 
 ## 1. Setup Accura Finger
-* Require `key.license` to implement Accura Finger SDK in to your app
+* Require `keyfinger.license` to implement Accura Finger SDK in to your app
 #### Step 1 : To initialize sdk on app start:
 
     FingerEngine fingerEngine = new FingerEngine();
